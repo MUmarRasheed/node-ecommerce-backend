@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width"/>
+    <style type="text/css">
+        /* Reset default styles */
+        body, table, td, a {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+
+        body {
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+
+        .body-wrap {
+            width: 100%;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .masthead {
+            padding: 20px;
+            background-color: #007bff;
+            text-align: center;
+        }
+
+        .masthead img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        h2 {
+            color: #007bff;
+        }
+
+        .button {
+            display: inline-block;
+            background-color: #007bff;
+            color: #ffffff;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin: 20px 0;
+            transition: background-color 0.3s;
+        }
+
+        .button:hover {
+            background-color: #0056b3;
+        }
+
+        .footer {
+            padding: 20px;
+            background-color: #f4f4f4;
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+        }
+
+        .footer a {
+            color: #007bff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <table class="body-wrap">
+        <tr>
+            <td class="container">
+                <!-- Message start -->
+                <table>
+                    <tr>
+                        <td align="center" class="masthead">
+                            <img src="https://thisisnuts.netlify.app/assets/images/logo.svg" width="220px" height="57px" alt="Company Logo">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="content">
+                            <h2>Dear {{data.name}},</h2>
+                            <p>
+                                Thank you for registering with us! To complete your registration, please verify your email address by clicking the link below:
+                            </p>
+                            <p style="text-align:center;">
+                                <a href="{{data.verificationLink}}" class="button">Verify Email</a>
+                            </p>
+                            <p>
+                                Please note that the verification link is valid for 1 hour. If you do not verify your email within this time, you will need to request a new verification link.
+                            </p>
+                            <p>
+                                If you did not create an account, please ignore this email.
+                            </p>
+                            <p>
+                                Thank you for your cooperation.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td class="footer">
+                <p>Sent by <a href="https://company.com/">{{company}}</a></p>
+                <p><a href="https://company.com/">{{company}}</a> | <a href="https://company.com/">For Contact</a></p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

@@ -1,0 +1,93 @@
+{
+  "Admin": {
+    "post": [
+      "upload-file",
+      "upload-file-on-s3",
+      "logout",
+      "add-category",
+      "add-subcategory"
+    ],
+    "get": [
+      "get-all-users",
+      "get-categories",
+      "get-category-by-id",
+      "get-subcategories",
+      "get-orders",
+      "get-order-by-id",
+      "get-pending-shops",
+      "get-shop-by-id"
+    ],
+    "put": [
+      "update-category",
+      "update-subcategory",
+      "update-order-status",
+      "approve-shop",
+      "update-user-status"
+    ],
+    "delete": [
+      "delete-category",
+      "remove-subcategory",
+      "delete-shop"
+    ]
+  },
+  "User": {
+    "post": [
+      "login",
+      "register-user",
+      "verify-email",
+      "logout",
+      "upload-file",
+      "upload-file-on-s3",
+      "login-with-google",
+      "add-card",
+      "add-to-cart",
+      "add-delivery-addresses",
+      "add-delivery-contact",
+      "create-order",
+      "add-shop",
+      "remove-card",
+      "add-product",
+      "add-product-stock"
+    ],
+    "get": [
+      "get-user",
+      "get-user-detail",
+      "get-all-users",
+      "get-categories",
+      "get-category-by-id",
+      "get-subcategories",
+      "get-cart-items",
+      "get-delivery-addresses",
+      "get-delivery-contacts",
+      "get-cards",
+      "get-shops",
+      "get-products",
+      "search-product",
+      "get-all-prducts",
+      "get-product-by-id",
+      "get-product-stocks",
+      "get-product-stock-by-id"
+    ],
+    "put": [
+      "update-profile",
+      "update-password",
+      "update-cart-items",
+      "update-delivery-address",
+      "update-shop",
+      "update-delivery-contact",
+      "update-product",
+      "update-product-stock"
+    ],
+    "delete": [
+      "delete-account",
+      "remove-cart-items",
+      "delete-delivery-address",
+      "delete-delivery-contact",
+      "delete-shop",
+      "remove-card",
+      "delete-product",
+      "remove-subcategory",
+      "delete-product-stock"
+    ]
+  }
+}

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>New Order Notification</title>
+    <style type="text/css">
+        body {
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            color: #333;
+        }
+        p {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .order-details, .delivery-details, .product-details {
+            margin-bottom: 20px;
+        }
+        .product-list {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        .product-list th, .product-list td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        .product-list th {
+            background-color: #f2f2f2;
+            text-align: left;
+        }
+        .total-section {
+            margin-top: 20px;
+        }
+        .total-section strong {
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>New Order Received!</h1>
+
+    <p>Dear Admin,</p>
+    <p>We are pleased to inform you that a new order has been placed. Please find the details of the order below, including the delivery information and product breakdown. Kindly ensure the order is processed promptly.</p>
+    <p>Thank you for your attention and prompt action on this matter.</p>
+
+    <!-- Order Details -->
+    <div class="order-details">
+        <p><strong>Order Number:</strong> {{data.orderNumber}}</p>
+        <p><strong>User Email:</strong> {{data.userEmail}}</p>
+        <p><strong>Order Date:</strong> {{data.orderDate}}</p>
+        <p><strong>Payment Method:</strong> {{data.paymentMethod}}</p>
+        <p><strong>Total Amount:</strong> ${{data.totalAmount}}</p>
+    </div>
+
+    <!-- Delivery Details -->
+    <div class="delivery-details">
+        <h3>Delivery Details</h3>
+        <p><strong>Address:</strong> {{data.deliveryAddress.address}}, {{data.deliveryAddress.city}}, {{data.deliveryAddress.state}} {{data.deliveryAddress.zipCode}}</p>
+        <p><strong>Contact:</strong> {{data.contactDetails.phoneNumber}}</p>
+        <p><strong>Delivery Tip:</strong> ${{data.deliveryTip}}</p>
+        <p><strong>Instructions:</strong> {{data.deliveryInstructions}}</p>
+        <p><strong>Estimated Delivery Time:</strong> {{data.deliveryTime}}</p>
+    </div>
+
+    <!-- Product Details -->
+    <div class="product-details">
+        <h3>Product Details</h3>
+        <table class="product-list">
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th>Total Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each data.products}}
+                <tr>
+                    <td>{{productName}}</td>
+                    <td>{{quantity}}</td>
+                    <td>${{unitPrice}}</td>
+                    <td>${{totalPrice}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Summary -->
+    <div class="total-section">
+        <p><strong>Subtotal:</strong> ${{data.subTotal}}</p>
+        <p><strong>Delivery Fee:</strong> ${{data.deliveryFee}}</p>
+        <p><strong>Grand Total:</strong> <strong>${{data.grandTotal}}</strong></p>
+    </div>
+
+    <p>Please process the order as soon as possible.</p>
+</body>
+</html>
