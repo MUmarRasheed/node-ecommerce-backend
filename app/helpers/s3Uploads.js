@@ -12,6 +12,7 @@ AWS.config.update({
 
 const s3 = new AWS.S3();
 
+
 const uploadOns3 = async (params) => {
   return new Promise((resolve) => {
     s3.upload(params, (err, data) => {
