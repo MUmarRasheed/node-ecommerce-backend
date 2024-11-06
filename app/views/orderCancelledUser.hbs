@@ -1,6 +1,5 @@
-<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head>
+  <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
@@ -48,8 +47,14 @@
         margin-bottom: 20px;
         line-height: 1.25;
       }
+      h1 {
+        font-size: 25px;
+      }
       h2 {
         font-size: 21px;
+      }
+      h3 {
+        font-size: 18px;
       }
       p, ul, ol {
         font-size: 13px;
@@ -68,8 +73,13 @@
       }
       .container .masthead {
         padding: 50px 0;
-        background: #007bff;
+        background: #222222;
         color: white;
+      }
+      .container .masthead h1 {
+        margin: 0 auto !important;
+        max-width: 90%;
+        text-transform: uppercase;
       }
       .container .content {
         background: white;
@@ -90,36 +100,31 @@
         font-weight: bold;
       }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <table class="body-wrap">
       <tr>
         <td class="container">
-
           <!-- Message start -->
           <table>
             <tr>
               <td align="center" class="masthead">
-                <img src="https://thisisnuts.netlify.app/assets/images/logo.svg" width="220" height="57" alt="Company Logo" />
+                <img
+                  src="https://thisisnuts.netlify.app/assets/images/logo.svg"
+                  width="220"
+                  height="57"
+                  alt="Logo"
+                />
               </td>
             </tr>
             <tr>
               <td class="content">
-                <h2>Dear {{data.name}},</h2>
-                <table>
-                  <tr>
-                    <td>
-                      <p>Thank you for registering with us! To complete your registration, please verify your email address by clicking the link below:</p>
-                      <p style="text-align:center;">
-                        <a href="{{data.verificationLink}}" class="button" style="color: white;">Verify Email</a>
-                      </p>
-                      <p>Please note that the verification link is valid for 1 hour. If you do not verify your email within this time, you will need to request a new verification link.</p>
-                      <p>If you did not create an account, please ignore this email.</p>
-                      <p>Thank you for your cooperation.</p>
-                    </td>
-                  </tr>
-                </table>
-                <p><em><a href="">– {{company}}</a></em></p>
+                <!-- Cancel Order Header Content -->
+                <h1>Order Canceled</h1>
+                <h1>Hi {{data.name}},</h1>
+                <p>We regret to inform you that your order <strong>{{data.orderNumber}}</strong> has been canceled.</p>
+                <p>If this was unexpected or you need further assistance, please don't hesitate to <a href="https://thisisnuts.netlify.app/contact">contact us</a>.</p>
+                <p>We apologize for any inconvenience caused.</p>
               </td>
             </tr>
           </table>
@@ -131,13 +136,19 @@
           <table>
             <tr>
               <td class="content footer" align="center">
-                <p>Sent by <a href="https://thisisnuts.netlify.app/">{{company}}</a></p>
-                <p><a href="https://thisisnuts.netlify.app/">{{company}}</a> | <a href="https://thisisnuts.netlify.app/">Contact us</a></p>
+                <p>Sent by
+                  <a href="https://thisisnuts.netlify.app/">
+                    {{company}}</a></p>
+                <p><a href="https://thisisnuts.netlify.app/">
+                    {{company}}</a>
+                  |
+                  <a href="https://thisisnuts.netlify.app/contact">
+                    Contact us</a></p>
               </td>
             </tr>
           </table>
         </td>
       </tr>
     </table>
-</body>
+  </body>
 </html>

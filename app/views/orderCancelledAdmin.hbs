@@ -1,0 +1,196 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+            font-size: 100%;
+            font-family: 'Avenir Next', "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
+            line-height: 1.65;
+        }
+        img {
+            max-width: 100%;
+            margin: 0 auto;
+            display: block;
+        }
+        body, .body-wrap {
+            width: 100% !important;
+            height: 100%;
+            background: #f8f8f8;
+        }
+        a {
+            color: #199ef1;
+            text-decoration: none;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .text-left {
+            text-align: left;
+        }
+        .button {
+            display: inline-block;
+            color: white;
+            background: #E24400;
+            border: solid #E24400;
+            border-width: 10px 20px 8px;
+            font-weight: bold;
+            border-radius: 4px;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            margin-bottom: 20px;
+            line-height: 1.25;
+        }
+        h1 {
+            font-size: 25px;
+        }
+        h2 {
+            font-size: 21px;
+        }
+        h3 {
+            font-size: 18px;
+        }
+        p, ul, ol {
+            font-size: 13px;
+            font-weight: normal;
+            margin-bottom: 20px;
+        }
+        .container {
+            display: block !important;
+            clear: both !important;
+            margin: 0 auto !important;
+            max-width: 580px !important;
+        }
+        .container table {
+            width: 100% !important;
+            border-collapse: collapse;
+        }
+        .container .masthead {
+            padding: 50px 0;
+            background: #222222;
+            color: white;
+        }
+        .container .masthead h1 {
+            margin: 0 auto !important;
+            max-width: 90%;
+            text-transform: uppercase;
+        }
+        .container .content {
+            background: white;
+            padding: 30px 35px;
+        }
+        .container .content.footer {
+            background: none;
+        }
+        .container .content.footer p {
+            margin-bottom: 0;
+            color: #888;
+            text-align: center;
+            font-size: 14px;
+        }
+        .container .content.footer a {
+            color: #888;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .product-table {
+            width: 100%;
+            margin: 20px 0;
+            border-collapse: collapse;
+        }
+        .product-table th, .product-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .product-table th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <table class="body-wrap">
+        <tr>
+            <td class="container">
+                <!-- Message start -->
+                <table>
+                    <tr>
+                        <td align="center" class="masthead">
+                            <img
+                                src="https://thisisnuts.netlify.app/assets/images/logo.svg"
+                                width="220"
+                                height="57"
+                                alt="Logo"
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="content">
+                            <h1>Order Canceled</h1>
+                            <h2>Hi Admin,</h2>
+                            <p>The order <strong>{{data.orderNumber}}</strong> placed by <strong>{{data.customerName}}</strong> has been canceled.</p>
+                            <p>Details:</p>
+                            <ul>
+                                <li><strong>Order Number:</strong> {{data.orderNumber}}</li>
+                                <li><strong>Customer Name:</strong> {{data.customerName}}</li>
+                                <li><strong>Customer Email:</strong> {{data.customerEmail}}</li>
+                                <li><strong>Order Date:</strong> {{data.orderDate}}</li>
+                                <li><strong>Cancellation Reason:</strong> {{data.cancellationReason}}</li>
+                                <li><strong>Total Amount:</strong> ${{data.totalAmount}}</li>
+                                <li><strong>Payment Method:</strong> {{data.paymentMethod}}</li>
+                            </ul>
+
+                            <h2>Canceled Products:</h2>
+                            {{#each data.products}}
+                                <h3>Shop: {{this.shopName}}</h3>
+                                <table class="product-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Product Name</th>
+                                            <th>Quantity</th>
+                                            <th>Price</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {{#each this.products}}
+                                            <tr>
+                                                <td>{{this.productName}}</td>
+                                                <td>{{this.quantity}}</td>
+                                                <td>${{this.price}}</td>
+                                            </tr>
+                                        {{/each}}
+                                    </tbody>
+                                </table>
+                            {{/each}}
+
+                            <p>Please review the cancellation and take any necessary action.</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td class="container">
+                <!-- Footer start -->
+                <table>
+                    <tr>
+                        <td class="content footer" align="center">
+                            <p>Sent by <a href="https://thisisnuts.netlify.app/">{{data.company}}</a></p>
+                            <p>
+                                <a href="https://thisisnuts.netlify.app/">{{data.company}}</a> |
+                                <a href="https://thisisnuts.netlify.app/">Contact us</a>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

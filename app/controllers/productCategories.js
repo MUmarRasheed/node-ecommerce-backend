@@ -57,8 +57,17 @@ async function createCategory(req, res) {
 // Get all categories
 async function getCategories(req, res) {
   try {
-    // Fetch all categories from the database
-    const categories = await Category.find().sort({ createdAt: -1 });
+    const { page = 1, limit = 10, sortBy = 'createdAt', sortOrder = -1 } = req.query;
+
+    // Create pagination and sorting options
+    const options = {
+      page: parseInt(page),
+      limit: parseInt(limit),
+      sort: { [sortBy]: parseInt(sortOrder) }
+    };
+
+    // Fetch paginated and sorted categories
+    const categories = await Category.paginate({}, options);
 
     // Return success response with categories
     return res.status(200).send(sendResponse(2002, messages[2002], true, categories));
@@ -67,6 +76,8 @@ async function getCategories(req, res) {
     return res.status(500).send(sendResponse(1000, messages[1000], false, error.message));
   }
 }
+
+
 
 // Get a single category by ID
 async function getCategoryById(req, res) {

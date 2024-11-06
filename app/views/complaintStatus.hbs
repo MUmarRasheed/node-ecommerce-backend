@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width"/>
+    <style type="text/css">
+        body, table, td, a {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+        body {
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+        .body-wrap {
+            width: 100%;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .masthead {
+            padding: 20px;
+            background-color: #007bff;
+            text-align: center;
+        }
+        .masthead img {
+            max-width: 100%;
+            height: auto;
+        }
+        .content {
+            padding: 20px;
+        }
+        h2 {
+            color: #007bff;
+        }
+        .footer {
+            padding: 20px;
+            background-color: #f4f4f4;
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+        }
+        .footer a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .product-details {
+            margin: 20px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .product-details h3 {
+            margin: 0 0 10px;
+        }
+        .product-details p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <table class="body-wrap">
+        <tr>
+            <td class="container">
+                <!-- Message start -->
+                <table>
+                    <tr>
+                        <td align="center" class="masthead">
+                            <img src="https://thisisnuts.netlify.app/assets/images/logo.svg" width="220px" height="57px" alt="Company Logo">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="content">
+                            <h2>Dear {{data.name}},</h2>
+                            <p>
+                                We are pleased to inform you that your complaint for Order Number: <strong>{{data.orderNumber}}</strong> regarding the product <strong>{{data.productName}}</strong> has been successfully resolved.
+                            </p>
+                            <div class="product-details">
+                                <h3>Product Details</h3>
+                                <p><strong>Product Name:</strong> {{data.productName}}</p>
+                                <p><strong>Resolution Summary:</strong> {{data.resolutionSummary}}</p>
+                                <p><strong>Status:</strong> {{data.status}}</p>
+                            </div>
+                            <p>
+                                If any actions were taken to resolve the issue, you may see updates in your order status or other relevant areas.
+                            </p>
+                            <p>
+                                Thank you for bringing this to our attention and allowing us to assist you. If you have any further questions or require additional help, please feel free to reach out to us.
+                            </p>
+                            <p>
+                                Sincerely,<br>Customer Support Team
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td class="footer">
+                <p>Sent by <a href="https://company.com/">{{company}}</a></p>
+                <p><a href="https://company.com/">{{company}}</a> | <a href="https://company.com/">For Contact</a></p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

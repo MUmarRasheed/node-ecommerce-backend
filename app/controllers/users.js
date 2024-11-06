@@ -6,13 +6,15 @@ const messages                                        = require("../messages/cus
 const sendEmail                                       = require("../helpers/sendEmail");
 const stripe                                          = require("stripe")(config.stripeClientSecret);
 const crypto                                          = require('crypto');
+const Shop                                            = require("../models/shops");
 
 const {
   sendResponse,
   getToken,
   getEmailTemplate,
   getLoginToken,
-  convertToObjectId
+  convertToObjectId,
+  generateSlug
 } = require("../helpers/utalityFunctions");
 
 //REGISTER
@@ -22,9 +24,9 @@ async function registerUser(req, res) {
     return res.status(400).send(sendResponse(1003, messages[1003], false, errors.errors));
   }
 
-  const { email, name, role, password } = req.body;
+  const { email, name, role, password, ownerName, address, phone, website, category } = req.body;
   let user = await Users.findOne({ email });
-  
+
   if (user) {
     return res.status(400).send(sendResponse(1010, messages[1010], false, false)); // Email already registered
   }
@@ -33,12 +35,41 @@ async function registerUser(req, res) {
   user = new Users({
     email,
     password,
-    name,
+    name: role === 1 ? name : undefined, // If role is 1, set name ,
+    
     role,
     isEmailVerified: role === 1, // Set email verification status directly for admins
+    shopStatus: role === 2 ? false : undefined, // Add shopStatus as false if role is 2
   });
 
-  await user.save(); // Save user before generating the login token
+  await user.save(); // Save user before creating shop
+
+  // If role is 2, create a new shop
+  if (role === 2) {
+    const shop = new Shop({
+      ownerId: user._id,
+      ownerName: ownerName,
+      address: address,
+      phone: phone,
+      website: website,
+      name: name, // Shop name should be the same as the user's name
+      slug: generateSlug(name), // Create a slug for the shop
+      description: "", // Add default description or get from req.body if needed
+      category: category,
+      isActive :  false,
+      isApproved : false, 
+      coverImage: {
+        thumbnail: "", // Default or placeholder
+        original: "" // Default or placeholder
+      },
+      logo: {
+        thumbnail: "", // Default or placeholder
+        original: "" // Default or placeholder
+      },
+    });
+
+    await shop.save(); // Save the new shop
+  }
 
   // Prepare email data for non-admin users only
   if (role !== 1) {
@@ -52,7 +83,7 @@ async function registerUser(req, res) {
 
     const emailData = {
       name,
-      verificationLink: `${config.link}verify-email?token=${verificationToken}`, // Verification link
+      verificationLink: `${config.apiUrl}api/users/verify-email?token=${verificationToken}`, // Verification link
     };
 
     const emailHtml = await getEmailTemplate(emailData, "emailVerification.hbs", false, false);
@@ -61,9 +92,8 @@ async function registerUser(req, res) {
     await sendEmail(email, config.mailEmail, emailHtml, emailData, "", config.verifySubject, "");
   }
 
-  return res.status(200).send(sendResponse(1009, messages[1009], true, true));
+  return res.status(200).send(sendResponse(1020, messages[1020], true, true));
 }
-
 
 async function verifyEmail(req, res) {
   const { token } = req.query;
@@ -117,9 +147,15 @@ async function login(req, res) {
       return res.status(400).send(sendResponse(1051, messages[1051], false, false)); // Missing password
     }
 
+    // Check if the user is an agency admin (role 2) and if shopStatus is false
+
+    if (user.role === 2 && user.isEmailVerified  && !user.shopStatus) {
+      console.log("🚀 ~ login ~ user.shopStatus:", user.shopStatus)
+      return res.status(403).send(sendResponse(1060, "Your shop is not active yet.", false, false)); // Inform about inactive shop
+    }
     // Check if the user is not an admin and email is not verified
     if (user.role !== 1 && !user.isEmailVerified) {
-      console.log("🚀 ~ login ~ user.role :", user.role )
+      console.log("🚀 ~ login ~ user.role :", user.role );
       console.log("User email not verified, sending verification email.");
       
       // Generate a new verification token
@@ -132,9 +168,10 @@ async function login(req, res) {
 
       // Prepare email data
       const emailData = {
-        name:user.name,
-        verificationLink: `${config.link}verify-email?token=${verificationToken}`, // Verification link
+        name: user.name,
+        verificationLink: `${config.apiUrl}verify-email?token=${verificationToken}`, // Verification link
       };
+      console.log("🚀 ~ login ~ emailData:", emailData)
     
       const emailSubject = config.verifySubject;
 
@@ -173,7 +210,7 @@ async function login(req, res) {
 
 
 async function getUser(req, res){
-   let user = await Users.findOne({ email: req.loginUser.email}, { password: 0 , __v: 0 } )
+   let user = await Users.findOne({ email: req.loginUser.email}, { password: 0 , __v: 0, verificationToken: 0, verificationTokenExpiry: 0 } )
   return res.status(200).send(sendResponse(1014, messages[1014], true, user));
 }
 
@@ -296,20 +333,31 @@ async function updateProfile(req, res) {
     if (!errors.isEmpty()) {
       return res.status(400).send(sendResponse(1003, messages[1003], false, errors.errors));
     }
-
-    // Remove sensitive fields that should not be updated
-    delete req.body.password;
-    delete req.body.email;
-
+   const email = req.loginUser.email
+    // Extract password, id, and other update fields from the request body
+    const { password, ...updateFields } = req.body;
     // Find the user by ID
-    const user = await Users.findOne({ _id: convertToObjectId(req.body.id) });
+    const user = await Users.findOne({ email });
 
     if (!user) {
       return res.status(404).send(sendResponse(1005, messages[1005], false));
     }
 
-    // Update user details using Object.assign()
-    Object.assign(user, req.body);
+    // Compare the provided password with the stored password hash
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordCorrect) {
+      return res.status(400).send(sendResponse(1007, "Incorrect password", false));
+    }
+
+    // Remove sensitive fields that should not be updated
+    delete updateFields.password; // Don't allow password to be updated via this process
+    delete updateFields.email;    // Optional: If you don't want email to be changed via profile update
+    delete updateFields.role;
+    delete updateFields.token;
+
+    // Update the user details using Object.assign()
+    Object.assign(user, updateFields);
 
     // Save the updated user to the database
     const updatedUser = await user.save();
@@ -321,9 +369,9 @@ async function updateProfile(req, res) {
     delete userResponse.stripeCustomerId;
 
     // Return success response with the updated user
-    return res.status(200).send(sendResponse(1032, messages[1032], true, userResponse));
+    return res.status(200).send(sendResponse(1032, messages[1032], true));
   } catch (error) {
-    // Check for duplicate email error
+    // Handle duplicate email error if the email is already taken
     if (error.code === 11000 && error.keyPattern.email) {
       return res.status(400).send(sendResponse(1010, messages[1010], false, false));
     }
@@ -354,6 +402,9 @@ async function getUserDetail(req, res) {
         active: 0,
         isLoggedIn: 0,
         stripeCustomerId: 0,
+        verificationToken: 0,
+        token: 0,
+        verificationTokenExpiry: 0
       }
     );
 
@@ -439,6 +490,42 @@ async function resendVerificationEmail(req, res) {
   return res.status(200).send(sendResponse(1009, messages[1009], true, true));
 }
 
+async function changePassword(req, res) {
+  try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+          return res.status(400).send(sendResponse(1003, messages[1003], false, errors.errors));
+      }
+
+      const user = await Users.findOne({ _id: req.loginUser._id }); // Assuming you're using req.loginUser to get the logged-in user's ID
+      if (!user) {
+          return res.status(400).send(sendResponse(1005, messages[1005], false, false));
+      }
+
+      // Check if the old and new passwords are the same
+      if (req.body.oldPassword === req.body.password) {
+          return res.status(400).send(sendResponse(1122, messages[1122], false, false)); // Message for old and new passwords being the same
+      }
+
+      // Check if the old password matches
+      const isMatch = await user.comparePassword(req.body.oldPassword); // Assuming you have a method to compare passwords
+      if (!isMatch) {
+          return res.status(400).send(sendResponse(1123, messages[1123], false, false)); // Use an appropriate message for password mismatch
+      }
+
+      // Update the user's password
+      user.password = req.body.password;
+      user.active = true;
+      user.token = "";
+
+      await user.save();
+      return res.status(200).send(sendResponse(1124, messages[1124], true, true));
+  } catch (error) {
+      console.error("Error in updatePassword:", error);
+      return res.status(500).send(sendResponse(1000, messages[1000], false, error.message));
+  }
+}
+
 
 module.exports = {
   login,
@@ -451,5 +538,6 @@ module.exports = {
   updateProfile,
   getUserDetail,
   getAllUsers,
-  verifyEmail
+  verifyEmail,
+  changePassword
 };

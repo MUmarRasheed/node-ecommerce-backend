@@ -11,11 +11,11 @@ const StockSchema = new mongoose.Schema({
   price: { type: Number, required: false },
   salePrice: { type: Number },
   unit: { type: String },
-  sku: { type: String, required: true },
+  sku: { type: String, required: false },
   isDisable: { type: Boolean },
   options: [{
-    name: { type: String, required: true },
-    value: { type: String, required: true }
+    name: { type: String, required: false },
+    value: { type: String, required: false }
   }],
   createdAt: { type: Number },
   updatedAt: { type: Number }

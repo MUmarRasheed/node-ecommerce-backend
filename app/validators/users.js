@@ -24,7 +24,7 @@ module.exports = function userValidator(api) {
             "Please enter a password at least 8 character and contain At least one uppercase.At least one lower case.At least one special character."
           )
           .notEmpty()
-          .withMessage("email should not be empty"),
+          .withMessage("password should not be empty"),
 
         body("role", "role is Required")
           .exists()
@@ -99,14 +99,19 @@ module.exports = function userValidator(api) {
 
     case "updateProfile":
       return [
-        body("id", "id is Required")
+          body("password", "password is Required")
           .exists()
           .isString()
-          .withMessage("id should be in String")
+          .withMessage("password should be string")
+          .isLength({ min: 8 })
+          .withMessage("password should 8 characters long")
+          .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[a-zA-Z\d@$.!%*#?&]/)
+          .withMessage(
+            "Please enter a password at least 8 character and contain At least one uppercase.At least one lower case.At least one special character."
+          )
           .notEmpty()
-          .withMessage("id should not be empty")
-          .custom(isValidObjectId)
-          .withMessage("id is not a valid ObjectId"),
+          .withMessage("password should not be empty"),
+
 
         body("name", "name is Required")
           .optional()
@@ -199,5 +204,33 @@ module.exports = function userValidator(api) {
           .custom(isValidObjectId)
           .withMessage("_id is not a valid ObjectId"),
       ];
+      case "changePassword":
+        return [
+          body("oldPassword", "oldPassword is Required")
+          .exists()
+          .isString()
+          .withMessage("oldPassword should be string")
+          .isLength({ min: 8 })
+          .withMessage("oldPassword should 8 characters long")
+          .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[a-zA-Z\d@$.!%*#?&]/)
+          .withMessage(
+            "Please enter a oldPassword at least 8 character and contain At least one uppercase.At least one lower case.At least one special character."
+          )
+          .notEmpty()
+          .withMessage("oldPassword should not be empty"),
+
+          body("password", "password is Required")
+            .exists()
+            .isString()
+            .withMessage("password should be string")
+            .isLength({ min: 8 })
+            .withMessage("password should 8 characters long")
+            .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[a-zA-Z\d@$.!%*#?&]/)
+            .withMessage(
+              "Please enter a password at least 8 character and contain At least one uppercase.At least one lower case.At least one special character."
+            )
+            .notEmpty()
+            .withMessage("password should not be empty"),
+        ];
   }
 };

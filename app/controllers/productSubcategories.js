@@ -34,13 +34,11 @@ async function addSubcategory(req, res) {
     const updatedCategory = await category.save();
 
     return res
-      .status(200)
-      .send(sendResponse(2006, messages[2006], true, updatedCategory));
+      .status(200).send(sendResponse(2006, messages[2006], true, updatedCategory));
   } catch (error) {
     console.error("Error in adding subcategory:", error);
     return res
-      .status(500)
-      .send(sendResponse(1000, messages[1000], false, error.message));
+      .status(500).send(sendResponse(1000, messages[1000], false, error.message));
   }
 }
 
@@ -122,9 +120,7 @@ async function getSubcategories(req, res) {
       .send(sendResponse(2008, messages[2008], true, category.subcategories));
   } catch (error) {
     console.error("Error in fetching subcategories:", error);
-    return res
-      .status(500)
-      .send(sendResponse(1000, messages[1000], false, error.message));
+    return res.status(500).send(sendResponse(1000, messages[1000], false, error.message));
   }
 }
 
@@ -166,9 +162,7 @@ async function updateSubcategory(req, res) {
     return res.status(200).send(sendResponse(2006, messages[2006], true, updatedCategory));
   } catch (error) {
     console.error("Error in updating subcategory:", error);
-    return res
-      .status(500)
-      .send(sendResponse(1000, messages[1000], false, error.message));
+    return res.status(500).send(sendResponse(1000, messages[1000], false, error.message));
   }
 }
 

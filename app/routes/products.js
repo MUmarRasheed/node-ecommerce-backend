@@ -15,6 +15,8 @@ loginRouter.post('/add-product', productValidator('addProduct'), productControll
 
 // Get All Products
 router.get('/get-products', productController.getAllProducts);
+loginRouter.get('/get-admin-products', productController.getAdminProducts);
+
 router.get('/search-product', productController.searchProducts);
 
 // Get Single Product

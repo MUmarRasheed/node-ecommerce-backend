@@ -1,7 +1,7 @@
 const Product = require('../models/products');
 const Stock = require('../models/productStocks'); // Import the Stock model
 const { validationResult } = require('express-validator');
-const { sendResponse, generateSlug , convertToObjectId , convertToMultipleObjectIds } = require('../helpers/utalityFunctions');
+const { sendResponse, generateSlug , convertToObjectId , convertToMultipleObjectIds ,generateSKU } = require('../helpers/utalityFunctions');
 const messages = require("../messages/customMessages");
 const ProductCategory = require('../models/productCategories'); // Import the ProductCategory model
 const config = require('config')
@@ -10,16 +10,17 @@ const Shops = require('../models/shops')
 // Create a Product
 async function addProduct(req, res) {
     try {
+        const userId = req.loginUser._id;
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).send(sendResponse(1003, messages[1003], false, errors.errors));
         }
 
         const {
-            name, 
-            description, 
-            image, 
-            productImages, 
+            name,
+            description,
+            image,
+            productImages,
             tag,
             stocks,
             categoryId,
@@ -40,7 +41,7 @@ async function addProduct(req, res) {
             return res.status(404).json(sendResponse(1065, messages[1065], false));
         }
         if (!shop.isActive || !shop.isApproved) {
-         return res.status(400).send(sendResponse(1095, messages[1095], false)); // Custom error code for inactive or unapproved shops
+            return res.status(400).send(sendResponse(1095, messages[1095], false));
         }
 
         // Check if the product already exists in the shop
@@ -57,26 +58,26 @@ async function addProduct(req, res) {
 
         // Generate slug for the product name
         const slug = generateSlug(name);
-        console.log("🚀 ~ addProduct ~ slug:", slug);
-        
+
         // Process tags to generate slugs for each tag
         const processedTags = tag.map(t => ({
             ...t,
-            slug: generateSlug(t.name) // Generate slug from tag name
+            slug: generateSlug(t.name)
         }));
 
         // Create a new product object
         const newProductData = {
             name,
-            slug, 
+            slug,
             description,
             image,
             productImages,
-            tag: processedTags, 
+            tag: processedTags,
             unit,
             categoryId,
             subcategoryId,
-            shopId
+            shopId,
+            userId
         };
 
         // Create and save the product
@@ -86,9 +87,15 @@ async function addProduct(req, res) {
         // Create Stocks if provided
         if (stocks && stocks.length > 0) {
             for (const stockData of stocks) {
+                // Generate SKU if not provided in stockData
+                const sku = stockData.sku || await generateSKU(stockData.title);
+
                 const newStock = new Stock({
                     ...stockData,
-                    productId: savedProduct._id // Save the product ID in stock
+                    sku, // Assign generated SKU
+                    userId,
+                    shopId,
+                    productId: savedProduct._id
                 });
                 const savedStock = await newStock.save();
                 savedProduct.stockIds.push(savedStock._id); // Add stock ID to product
@@ -97,15 +104,13 @@ async function addProduct(req, res) {
         }
 
         // Return success response with the created product
-        return res.status(201).send(sendResponse(2010, messages[2010], savedProduct));
+        return res.status(201).send(sendResponse(2010, messages[2010], true, savedProduct));
 
     } catch (error) {
         console.error("Error creating product:", error);
         return res.status(500).send(sendResponse(1000, messages[1000], false, error.message));
     }
 }
-
-
 
 async function updateProduct(req, res) {
     try {
@@ -115,11 +120,10 @@ async function updateProduct(req, res) {
             return res.status(400).send(sendResponse(1003, messages[1003], false, errors.errors));
         }
 
-        const { categoryId, stocks, tag, shopId, subcategoryId } = req.body;
+        const { categoryId, stocks, tag, shopId, subcategoryId, name } = req.body;
 
         // Find the product by ID and check if it belongs to the same shop
         const product = await Product.findOne({ _id: req.params.id, shopId });
-        console.log("🚀 ~ updateProduct ~ product:", product);
         if (!product) {
             return res.status(404).send(sendResponse(2003, messages[2003], false));
         }
@@ -132,15 +136,19 @@ async function updateProduct(req, res) {
             }
         }
 
-        // If tags are provided, generate slug for each tag
+        // Check if the name has been updated and regenerate the slug if necessary
+        if (name && name !== product.name) {
+            product.name = name;
+            product.slug = generateSlug(name); // Update the product's main slug
+        }
+
+        // If tags are provided, generate a slug for each tag
         if (tag && tag.length > 0) {
             const processedTags = tag.map(t => ({
                 name: t.name,  // Keep the original name
                 slug: generateSlug(t.name)  // Generate slug from tag name
             }));
-            console.log("🚀 ~ processedTags ~ processedTags:", processedTags);
             product.tag = processedTags; // Update the product's tags with slugs
-            console.log("🚀 ~ updateProduct ~ product.tag:", product.tag);
         }
 
         // Update product fields (excluding stocks for now)
@@ -150,35 +158,35 @@ async function updateProduct(req, res) {
         if (stocks && stocks.length > 0) {
             product.stockIds = []; // Reset stock IDs array
 
-            // Update or create stocks without checking for existing ones
+            // Update or create stocks
             for (const stockData of stocks) {
                 const stockUpdate = {
-                title: stockData.title,
-                price: stockData.price,
-                salePrice: stockData.salePrice,
-                minPrice: stockData.minPrice,
-                maxPrice: stockData.maxPrice,
-                quantity: stockData.quantity,
-                sku: stockData.sku,
-                options: stockData.options,
-                unit: stockData.unit,
-                isDisable: stockData.isDisable // Keep options as is
+                    title: stockData.title,
+                    price: stockData.price,
+                    salePrice: stockData.salePrice,
+                    minPrice: stockData.minPrice,
+                    maxPrice: stockData.maxPrice,
+                    quantity: stockData.quantity,
+                    options: stockData.options,
+                    shopId: shopId,
+                    userId: req.loginUser._id,
+                    unit: stockData.unit,
+                    isDisable: stockData.isDisable
                 };
-                console.log("🚀 ~ updateProduct ~ stockUpdate:", stockUpdate);
 
-                // Update existing stock if it exists, or create a new one
+                // Check if stock with the same title and product ID already exists
                 const existingStock = await Stock.findOne({ title: stockData.title, productId: product._id });
-                console.log("🚀 ~ updateProduct ~ existingStock:", existingStock);
-
                 if (existingStock) {
-                    // Update existing stock details
+                    // Keep the existing SKU and update other details
                     Object.assign(existingStock, stockUpdate);
                     await existingStock.save();
                     product.stockIds.push(existingStock._id); // Add updated stock ID
                 } else {
-                    // Create new stock and link to product
+                    // Generate SKU only for new stock
+                    const sku = await generateSKU(stockData.title);
                     const newStock = new Stock({
                         ...stockUpdate,
+                        sku, // Assign generated SKU
                         productId: product._id // Save the product ID in stock
                     });
                     const savedStock = await newStock.save();
@@ -223,12 +231,12 @@ const getAllProducts = async (req, res) => {
                     as: 'stockDetails' // The resulting field with stock data
                 }
             },
-            {
-                // Filter out products that have no stock available
-                $match: {
-                    stockDetails: { $ne: [] } // Include only products with stock details
-                }
-            },
+            // {
+            //     // Filter out products that have no stock available
+            //     $match: {
+            //         stockDetails: { $ne: [] } // Include only products with stock details
+            //     }
+            // },
             {
                 $facet: {
                     products: [
@@ -251,6 +259,91 @@ const getAllProducts = async (req, res) => {
                                     price: 1,
                                     salePrice: 1,
                                     quantity: 1,
+                                    title: 1,
+                                    sku: 1,
+                                    unit: 1 // Assuming youhave a 'unit' field in stocks
+                                }
+                            }
+                        }
+                    ],
+                    totalCount: [
+                        { $count: 'total' } // Count the total number of products with stock
+                    ]
+                }
+            }
+        ]);
+
+        const totalDocs = result[0].totalCount.length > 0 ? result[0].totalCount[0].total : 0;
+
+        const response = {
+            docs: result[0].products,
+            totalDocs: totalDocs,
+            limit: limit,
+            page: page,
+            totalPages: Math.ceil(totalDocs / limit)
+        };
+
+        return res.status(200).json(sendResponse(2011, messages[2011], true, response));
+    } catch (err) {
+        console.error("Error fetching products with stocks:", err);
+        return res.status(500).send(sendResponse(1000, messages[1000], false, err.message));
+    }
+};
+
+const getAdminProducts = async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).send(sendResponse(1003, messages[1003], false, errors.errors));
+    }
+
+    let page = !req.query.page ? 1 : parseInt(req.query.page);
+    let limit = !req.query.limit ? config.pageSize : parseInt(req.query.limit);
+    let skip = (page - 1) * limit;
+
+    let match = { userId: req.loginUser._id }; // You can add filters here if necessary
+
+    try {
+        // Use a single aggregation with $facet for pagination and counting
+        const result = await Product.aggregate([
+            { $match: match }, // Match any specific filters if necessary
+            {
+                $lookup: {
+                    from: 'stocks', // The collection name for stocks
+                    localField: 'stockIds', // Field in products to match
+                    foreignField: '_id', // Field in stocks to match
+                    as: 'stockDetails' // The resulting field with stock data
+                }
+            },
+            // {
+            //     // Filter out products that have no stock available
+            //     $match: {
+            //         stockDetails: { $ne: [] } // Include only products with stock details
+            //     }
+            // },
+            {
+                $facet: {
+                    products: [
+                        { $sort: { createdAt: -1 } }, // Sort by creation date
+                        { $skip: skip }, // Pagination: skip the previous pages
+                        { $limit: limit }, // Limit the number of results
+                        {
+                            // Project only necessary fields for both products and stocks
+                            $project: {
+                                name: 1,
+                                slug: 1,
+                                description: 1,
+                                image: 1,
+                                productImages: 1,
+                                unit: 1,
+                                userId: 1,
+                                tag: 1,
+                                ordersCount: 1,
+                                stockDetails: {
+                                    _id: 1,
+                                    price: 1,
+                                    salePrice: 1,
+                                    quantity: 1,
+                                    sku: 1,
                                     title: 1,
                                     unit: 1 // Assuming you have a 'unit' field in stocks
                                 }
@@ -280,7 +373,6 @@ const getAllProducts = async (req, res) => {
         return res.status(500).send(sendResponse(1000, messages[1000], false, err.message));
     }
 };
-
 
 // Get Single Product by ID
 async function getProductById(req, res) {
@@ -520,6 +612,7 @@ module.exports = {
 addProduct,
 getProductById,
 getAllProducts,
+getAdminProducts,
 updateProduct,
 deleteProduct,
 searchProducts

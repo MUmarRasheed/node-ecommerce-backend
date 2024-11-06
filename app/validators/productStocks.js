@@ -27,7 +27,7 @@ module.exports = function stockValidator(api) {
           .withMessage("Quantity must be a non-negative integer"),
         body("unit").optional().notEmpty().withMessage("unit must not be empty"),
         body("sku")
-          .exists()
+          .optional()
           .notEmpty()
           .withMessage("SKU is required"),
         body("options")

@@ -1,35 +1,79 @@
 {
-  "Admin": {
+  "SuperAdmin": {
     "post": [
       "upload-file",
       "upload-file-on-s3",
       "logout",
       "add-category",
-      "add-subcategory"
+      "add-subcategory",
+      "register-user"
     ],
     "get": [
       "get-all-users",
+      "get-user-detail",
       "get-categories",
       "get-category-by-id",
       "get-subcategories",
-      "get-orders",
+      "get-user",
       "get-order-by-id",
       "get-pending-shops",
-      "get-shop-by-id"
+      "get-shops"
     ],
     "put": [
       "update-category",
       "update-subcategory",
-      "update-order-status",
       "approve-shop",
-      "update-user-status"
+      "update-user-status",
+      "update-profile"
     ],
     "delete": [
       "delete-category",
       "remove-subcategory",
+      "delete-user"
+    ]
+  },
+
+  "Admin": {
+    "post": [
+      "upload-file",
+      "upload-file-on-s3",
+      "logout",
+      "add-product",
+      "add-product-stock",
+      "add-shop"
+    ],
+    "get": [
+      "get-all-users",
+      "get-categories",
+      "get-user",
+      "get-orders",
+      "get-admin-complaints",
+      "get-admin-products",
+      "get-product-stocks",
+      "get-product-stock-by-id",
+      "get-order-by-id",
+      "get-category-by-id",
+      "get-subcategories",
+      "get-admin-shop",
+      "get-user-detail",
+      "get-shop-by-id"
+    ],
+    "put": [
+      "update-product",
+      "update-product-stock",
+      "update-shop",
+      "update-profile",
+      "update-complaint-status",
+      "update-order-status",
+      "change-password"
+    ],
+    "delete": [
+      "delete-product",
+      "delete-product-stock",
       "delete-shop"
     ]
   },
+
   "User": {
     "post": [
       "login",
@@ -44,10 +88,9 @@
       "add-delivery-addresses",
       "add-delivery-contact",
       "create-order",
-      "add-shop",
       "remove-card",
-      "add-product",
-      "add-product-stock"
+      "add-to-wishlist",
+      "submit-complaint"
     ],
     "get": [
       "get-user",
@@ -66,28 +109,30 @@
       "get-all-prducts",
       "get-product-by-id",
       "get-product-stocks",
-      "get-product-stock-by-id"
+      "get-product-stock-by-id",
+      "get-user-orders",
+      "get-wishlist",
+      "get-order-by-id",
+      "get-user-complaints"
     ],
     "put": [
       "update-profile",
       "update-password",
       "update-cart-items",
       "update-delivery-address",
-      "update-shop",
       "update-delivery-contact",
-      "update-product",
-      "update-product-stock"
+      "cancel-order",
+      "change-password"
     ],
     "delete": [
       "delete-account",
       "remove-cart-items",
       "delete-delivery-address",
       "delete-delivery-contact",
-      "delete-shop",
       "remove-card",
-      "delete-product",
-      "remove-subcategory",
-      "delete-product-stock"
+      "remove-wishlist",
+      "clear-wishlist",
+      "delete-complaint"
     ]
   }
 }

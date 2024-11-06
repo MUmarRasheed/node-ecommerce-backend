@@ -97,8 +97,29 @@ let messages = {
   1097: "Shop is already approved",
   1098: "Shop Deleted Successfully",
   1099: "You are not authorized to manage stock for this product.",
-  
+  1100: "Product added successfully to wishlist.",
+  1101: "Product is already in your wishlist.",
+  1102: "Product removed successfully from wishlist.",
+  1103: "Wishlist retrieved successfully.",
+  1104: "Wishlist cleared successfully.",
+  1105: "Wishlist not found.",
+  1106: "Product already in wishlist.",
+  1107: "Order is already dispatched.",
+  1108: "Order has been cancelled",
+  1109: "Order has already been cancelled",
   1113: "Token Expired",
+  1114: "Complaints not found.",                     // Complaint not found for specific queries
+  1115: "Failed to retrieve complaints.",           // Retrieval error for complaints
+  1116: "Complaint filed successfully.",            // Complaint created
+  1117: "Complaint status updated successfully.",   // Status update success
+  1118: "Complaint deleted successfully.",          // Complaint deletion success
+  1119: "Complaints retreived successfully.",          // Complaint deletion success
+  1120: "Complaint is already resolved.",
+  1121: "A complaint for this product has already been submitted.",
+  1122: "Old and new password cannot be same",
+  1123: "Password didn't match",
+  1124: "Password changed successfully",
+  
   2001: "Category created successfully",
   2002: "Category list fetched successfully",
   2003: "Category not found",
@@ -116,7 +137,8 @@ let messages = {
   2013: "Product Updated",
   2014: "Product Deleted",
   2015: "Product Not Found",
-  2016: "Category Already Exist"
+  2016: "Category Already Exist",
+ 2017:  "Stock with this title already exists for the product."
 };
 
 module.exports = messages;

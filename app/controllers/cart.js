@@ -1,4 +1,4 @@
-const Cart = require('../models/Cart'); // Ensure the path is correct
+const Cart = require('../models/cart'); // Ensure the path is correct
 const Product = require('../models/products'); // Ensure the path is correct
 const Stock = require('../models/productStocks'); // Ensure the path is correct
 const { validationResult } = require('express-validator');

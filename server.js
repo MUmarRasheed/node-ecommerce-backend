@@ -13,9 +13,6 @@ const app = express();
 const multer = require("multer")
 const upload =multer();
 
-app.use(express.json());
-
-app.use(upload.any());
 //Database Connection
 mongoConnect();
 
@@ -42,9 +39,12 @@ app.use(function (request, response, next) {
   next();
 });
 
-app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
+app.use(express.json({ limit: "200mb" }));
+app.use(bodyParser.urlencoded({ limit: "200mb", extended: true }));
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(morgan("combined"));
+// app.use(upload.any());
+
 app.use((req, res, next) => {
   req.setTimeout(300000); // 5 minutes in milliseconds
   next();
@@ -56,10 +56,10 @@ app.use(function (req, res, next) {
 });
 
 // Define Routes where we have openAPi's
-app.use("/api", require("./app/routes/users").router);
-app.use("/api", require("./app/routes/socialLogin").router);
-app.use("/api", require("./app/routes/products").router);
-app.use("/api", require("./app/routes/productStocks").router);
+app.use("/api/users", require("./app/routes/users").router);
+app.use("/api/sso", require("./app/routes/socialLogin").router);
+app.use("/api/products", require("./app/routes/products").router);
+app.use("/api/products", require("./app/routes/productStocks").router);
 
 //check the authuntication of user
 app.use(function (req, res, next) {
@@ -71,18 +71,20 @@ app.use(function (req, res, next) {
   checkApiAccessMiddleware(req, res, next);
 });
 
-app.use("/api", require("./app/routes/users").loginRouter);
-app.use("/api", require("./app/routes/fileUploads").loginRouter);
-app.use("/api", require("./app/routes/card").loginRouter)
-app.use('/api', require("./app/routes/productCategory").loginRouter);
-app.use('/api', require("./app/routes/productSubcategories").loginRouter);
-app.use('/api', require("./app/routes/products").loginRouter);
-app.use("/api", require("./app/routes/shops").loginRouter);
-app.use("/api", require("./app/routes/productStocks").loginRouter);
-app.use("/api", require("./app/routes/cart").loginRouter);
-app.use("/api", require("./app/routes/deliveryAddresses").loginRouter);
-app.use("/api", require("./app/routes/deliveryContacts").loginRouter);
-app.use("/api", require("./app/routes/checkout").loginRouter);
+app.use("/api/users", require("./app/routes/users").loginRouter);
+app.use("/api/fileupload", require("./app/routes/fileUploads").loginRouter);
+app.use("/api/card", require("./app/routes/card").loginRouter)
+app.use('/api/products', require("./app/routes/productCategory").loginRouter);
+app.use('/api/products', require("./app/routes/productSubcategories").loginRouter);
+app.use('/api/products', require("./app/routes/products").loginRouter);
+app.use("/api/shops", require("./app/routes/shops").loginRouter);
+app.use("/api/products", require("./app/routes/productStocks").loginRouter);
+app.use("/api/cart", require("./app/routes/cart").loginRouter);
+app.use("/api/addresses", require("./app/routes/deliveryAddresses").loginRouter);
+app.use("/api/contacts", require("./app/routes/deliveryContacts").loginRouter);
+app.use("/api/checkout", require("./app/routes/checkout").loginRouter);
+app.use("/api/wishlists", require("./app/routes/wishLists").loginRouter)
+app.use("/api/complaints", require("./app/routes/orderComplaints").loginRouter);
 
 app.listen(config.PORT, async () => {
   console.log(`Server is Running on ${config.PORT}`);

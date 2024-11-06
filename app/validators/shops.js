@@ -37,6 +37,8 @@ const shopValidator = (method) => {
             ];
         case 'approveShop':
             return [
+                body('action').notEmpty().withMessage('action is required'),
+                body('reason').optional().notEmpty().withMessage('reason is required'),
                 param('id').notEmpty().withMessage('Shop ID is required'),
             ];
         case 'getPendingShops':

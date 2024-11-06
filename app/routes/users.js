@@ -58,6 +58,7 @@ router.post(
   Users.forgotPassword
 );
 
+loginRouter.put("/change-password", userValidator("changePassword"), Users.changePassword);
 
 loginRouter.get(
   "/get-all-users",

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Shop Has Been Disapproved</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; }
+        .header { background-color: #f8f8f8; padding: 10px; text-align: center; }
+        .footer { font-size: 12px; color: #999; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Your Shop Has Been Disapproved</h1>
+        </div>
+        <p>Dear {{name}},</p>
+        <p>We regret to inform you that your shop <strong>{{name}}</strong> has been disapproved for the following reason:</p>
+        <p style="color: #d9534f;"><strong>{{data.reason}}</strong></p>
+        <p>Please review the reason for disapproval and make the necessary adjustments. If you believe this decision was made in error, feel free to contact our support team.</p>
+        <p>Thank you for your understanding.</p>
+        <p>Best regards,</p>
+        <p>The Team</p>
+        <div class="footer">
+            <p>&copy; {{currentYear}} Your Company Name. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

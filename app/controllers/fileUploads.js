@@ -14,7 +14,7 @@ async function uploadFile(req, res) {
 
     for (const element of fileArray) {
       resultArray.push({
-        url: `${config.serverApiUrl}/uploads/${element.filename}`
+        url: `${config.apiUrl}uploads/${element.filename}`
       })
     }
     console.log('resultArray', resultArray)
@@ -26,6 +26,20 @@ async function uploadFile(req, res) {
     }
 }
 
+const folderMapping = {
+  "productImage": "Products/Images",
+  "productThumbnail": "Products/Thumbnails",
+  "categoryImage": "Categories/Images",
+  "categoryThumbnail": "Categories/Thumbnails",
+  "categoryIcon": "Categories/Icons",
+  "subcategoryImage": "Subcategories/Images",
+  "subcategoryIcon": "Subcategories/Icons",
+  "shopLogo": "Shops/Logos",
+  "shopBanner": "Shops/Banners",
+  "userProfilePhoto": "Profiles/UserProfilePhotos",
+  "userCoverPhoto": "Profiles/CoverPhotos"
+};
+
 const uploadOnS3Api = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -34,31 +48,18 @@ const uploadOnS3Api = async (req, res) => {
 
   try {
     let files;
-    if (typeof req.files !== "undefined" && req.files.length > 0 ) {
+    if (typeof req.files !== "undefined" && req.files.length > 0) {
       const fieldname = req.files[0].fieldname;
-      switch (fieldname) {
-        case "image":
-          files = await uploadMultipleFilesOnS3(req.files, "images");
-          break;
-        case "video":
-          files = await uploadMultipleFilesOnS3(req.files, "videos");
-          break;
-        case "videoThumbnail":
-          files = await uploadMultipleFilesOnS3(req.files, "VideosThumbnails");
-          break
-        case "banner":
-          files = await uploadMultipleFilesOnS3(req.files, "Banners");
-          break
-        default:
-          return res.status(400).send(sendResponse(1000,"Unsupported file type.", false));
-      }
+      const folder = folderMapping[fieldname];
 
-      files = files.map(file => ({ url: file }));
+      if (folder) {
+        files = await uploadMultipleFilesOnS3(req.files, folder);
 
-      if (files && files.length > 0) {
+        files = files.map(file => ({ url: file }));
+
         return res.status(200).json(sendResponse(1037, messages[1037], true, files));
       } else {
-        return res.status(400).send(sendResponse(1038, messages[1038], false));
+        return res.status(400).send(sendResponse(1000, "Unsupported file type.", false));
       }
     } else {
       return res.status(400).send(sendResponse(1038, messages[1038], false));

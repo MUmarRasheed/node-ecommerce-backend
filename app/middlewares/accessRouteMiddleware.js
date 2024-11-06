@@ -1,26 +1,28 @@
-const accessApis                        = require("../apis/accessApis.json");
-const roles                             = require("../roles/roles.json");
-const { sendResponse }                  = require("../helpers/utalityFunctions");
-const messages                          = require("../messages/customMessages");
+const accessApis = require("../apis/accessApis.json");
+const roles = require("../roles/roles.json");
+const { sendResponse } = require("../helpers/utalityFunctions");
+const messages = require("../messages/customMessages");
 
-//This Middleware will check user have the access of api which he is requested and called after the login
+// This Middleware will check if the user has access to the requested API after login
 function checkApiAccessMiddleware(req, res, next) {
-  //split the api endPoint
+  // Split the API endpoint, ignoring query parameters
   let url = req.url;
-  url = url.replace("/api/", "");
-  url = url.split("/")[0];
-  url = url.split("?")[0];
-
-  //get the requested http method from Request
+  url = url.replace("/api/", "").split("?")[0]; // Ignore query parameters
+  
+  const urlParts = url.split("/");
+  
+  // Get the action part only
+  const actionUrl = urlParts.slice(1).join("/").split("/")[0]; 
+  
+  // Get the requested HTTP method from Request
   let method = req.method;
-  let role = req.loginUser.role ? req.loginUser.role : req.body.role; // have to pass the dynamic role based on request
+  let role = req.loginUser.role ? req.loginUser.role : req.body.role; // Pass the dynamic role based on request
 
-  //check the user
-  if (accessApis[roles[role]][method.toLowerCase()].includes(url)) {
+  // Check user access
+  if (accessApis[roles[role]][method.toLowerCase()].includes(actionUrl)) {
     next();
   } else {
-    let err = false;
-    return res.status(401).send(sendResponse(1002, messages[1002], false, err));
+    return res.status(401).send(sendResponse(1002, messages[1002], false, false));
   }
 }
 

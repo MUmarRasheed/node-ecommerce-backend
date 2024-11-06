@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <style type="text/css">
+        /* Reset default styles */
+        body, table, td, a {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+            margin: 0;
+            padding: 0;
+            border-collapse: collapse;
+        }
+
+        body {
+            width: 100% !important;
+            height: 100% !important;
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+            color: #333;
+        }
+
+        .body-wrap {
+            width: 100%;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .masthead {
+            padding: 20px;
+            background-color: #007bff;
+            text-align: center;
+            color: white;
+        }
+
+        .masthead img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        h2 {
+            color: #007bff;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 10px 15px;
+            color: white;
+            background-color: #28a745;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-top: 10px;
+        }
+
+        .footer {
+            padding: 20px;
+            background-color: #f4f4f4;
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+        }
+
+        .footer a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        /* Responsive Styles */
+        @media only screen and (max-width: 600px) {
+            .container {
+                width: 100% !important;
+                box-shadow: none;
+            }
+            .content {
+                padding: 10px;
+            }
+            .cta-button {
+                width: 100%;
+                text-align: center;
+                padding: 12px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <table class="body-wrap">
+        <tr>
+            <td>
+                <table class="container" align="center">
+                    <tr>
+                        <td class="masthead">
+                            <img src="https://thisisnuts.netlify.app/assets/images/logo.svg" width="220px" height="57px" alt="Company Logo">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="content">
+                            <h2>Hello {{data.name}},</h2>
+                            <p>A new complaint has been filed regarding your product: <strong>{{data.productName}}</strong>.</p>
+                            <p><strong>Complaint Filed By:</strong></p>
+                            <table width="100%">
+                                <tr>
+                                    <td><strong>Customer Name:</strong></td>
+                                    <td>{{data.complaint.firstName}} {{data.complaint.lastName}}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Email:</strong></td>
+                                    <td>{{data.complaint.email}}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Phone:</strong></td>
+                                    <td>{{data.complaint.phoneNumber}}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Date of Complaint:</strong></td>
+                                    <td>{{data.complaint.dateOfComplaint}}</td>
+                                </tr>
+                            </table>
+                            <p><strong>Complaint Details:</strong></p>
+                            <table width="100%">
+                                <tr>
+                                    <td><strong>Order Number:</strong></td>
+                                    <td>{{data.complaint.orderNumber}}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Nature of Complaint:</strong></td>
+                                    <td>{{data.complaint.natureOfComplaint}}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Description:</strong></td>
+                                    <td>{{data.complaint.description}}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Resolution Sought:</strong></td>
+                                    <td>{{data.complaint.resolutionSought}}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Priority:</strong></td>
+                                    <td>{{data.complaint.priority}}</td>
+                                </tr>
+                            </table>
+                            <p>Please review this complaint in your dashboard to respond promptly.</p>
+                            <a href="https://thisisnuts.netlify.app/" class="cta-button">Check Complaint</a>
+                            <p>Thank you,</p>
+                            <p>Your Company Team</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td class="footer">
+                <p>Sent by <a href="https://thisisnuts.netlify.app/">{{company}}</a></p>
+                <p><a href="https://thisisnuts.netlify.app/">{{company}}</a> | <a href="https://thisisnuts.netlify.app/">For Contact</a></p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

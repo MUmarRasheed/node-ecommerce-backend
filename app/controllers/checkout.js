@@ -9,9 +9,9 @@ const Product = require('../models/products'); // Assuming you have a Product mo
 const Order = require('../models/order'); // Assuming you have an Order model for saving order records
 const { validationResult } = require('express-validator');
 const Transaction = require('../models/transaction'); // Import the Transaction model
-const Cart = require('../models/Cart'); // Assuming this is the user model
+const Cart = require('../models/cart'); // Assuming this is the user model
 const Stock = require('../models/productStocks')
-
+const Shop = require('../models/shops');
 // Checkout API
 
 const checkout = async (req, res) => {
@@ -96,6 +96,8 @@ const checkout = async (req, res) => {
                 stockId: stock._id,
                 quantity: item.quantity,
                 price: item.price,
+                shopId: product.shopId, // Add shopId from product
+                ownerId: product.userId
             });
         }
 
@@ -119,7 +121,7 @@ const checkout = async (req, res) => {
             deliveryInstructions,
             paymentIntentId: paymentIntent.id,
             shippingFee,
-            orderStatus: 'new',
+            orderStatus: 'new'
         });
 
         await order.save();
@@ -189,17 +191,7 @@ const checkout = async (req, res) => {
         );
         
         // Return successful response
-        return res.status(200).send(sendResponse(1092, messages[1092], true, {
-            orderId: order._id,
-            paymentIntentId: paymentIntent.id,
-            subTotal,
-            totalAmount,
-            deliveryAddress: address,
-            contactDetails: contact,
-            leaveAtDoor,
-            deliveryInstructions,
-            shippingFee
-        }));
+        return res.status(200).send(sendResponse(1092, messages[1092], true));
 
     } catch (error) {
         console.error("🚀 ~ checkout ~ error:", error);
@@ -218,25 +210,68 @@ const getOrders = async (req, res) => {
             return res.status(400).send(sendResponse(1003, messages[1003], false, errors.array()));
         }
 
-        // Fetch orders for the user
-        const orders = await Order.find({})
-            .sort({ createdAt: -1 }) // Sort by newest first
-            .lean();
+        // Get pagination parameters from query
+        const { page = 1, limit = 10 } = req.query; // Default to page 1 and limit 10
 
-        // Add logs for better debugging
-        console.log("🚀 ~ getOrders ~ orders:", orders);
+        // Fetch orders with pagination
+        const options = {
+            page: parseInt(page),
+            limit: parseInt(limit),
+            sort: { createdAt: -1 } // Sort by newest first
+        };
 
-        if (!orders.length) {
+        const orders = await Order.paginate({}, options);
+
+        if (!orders.docs.length) {
             return res.status(404).send(sendResponse(1088, messages[1088], false));
         }
 
-        // Return orders to the user
-        return res.status(200).send(sendResponse(200, messages[200], true, { orders }));
+        // Return orders to the user with pagination info
+        return res.status(200).send(sendResponse(200, messages[200], true, orders));
     } catch (error) {
         console.error("🚀 ~ getOrders ~ error:", error);
         return res.status(400).send(sendResponse(1089, messages[1089], false, error.message));
     }
 };
+const getOrdersByUserId = async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).send(sendResponse(1003, messages[1003], false, errors.array()));
+        }
+
+        // Get pagination parameters from query
+        const { page = 1, limit = 10, orderNumber } = req.query; // Default to page 1 and limit 10
+
+        // Build the query object
+        const query = { userId: req.loginUser._id };
+
+        // If an orderNumber is provided, add it to the query using regex for partial matching
+        if (orderNumber) {
+            query.orderNumber = { $regex: new RegExp(orderNumber, 'i') }; // 'i' for case-insensitive matching
+        }
+
+        // Fetch orders for the user with pagination
+        const options = {
+            page: parseInt(page),
+            limit: parseInt(limit),
+            sort: { createdAt: -1 } // Sort by newest first
+        };
+
+        const orders = await Order.paginate(query, options);
+
+        if (!orders.docs.length) {
+            return res.status(404).send(sendResponse(1088, messages[1088], false));
+        }
+
+        // Return orders to the user with pagination info
+        return res.status(200).send(sendResponse(200, messages[200], true, orders));
+    } catch (error) {
+        console.error("🚀 ~ getOrdersByUserId ~ error:", error);
+        return res.status(500).send(sendResponse(1089, messages[1089], false, error.message));
+    }
+};
+
 
 // Get a specific order by ID
 const getOrderById = async (req, res) => {
@@ -250,9 +285,6 @@ const getOrderById = async (req, res) => {
         // Fetch the order by ID and check if it belongs to the user
         const order = await Order.findOne({ _id: orderId }).lean();
 
-        // Add logs for better debugging
-        console.log("🚀 ~ getOrderById ~ orderId:", orderId);
-        console.log("🚀 ~ getOrderById ~ order:", order);
 
         if (!order) {
             return res.status(404).send(sendResponse(1090, messages[1090], false));
@@ -307,9 +339,116 @@ const updateOrderStatus = async (req, res) => {
     }
 };
 
+
+const cancelOrder = async (req, res) => {
+    try {
+        const userId = req.loginUser._id; // Assuming user is authenticated
+        const { orderId, cancellationReason } = req.body;
+
+        // Find the order by id and ensure it belongs to the user
+        const order = await Order.findOne({ _id: orderId, userId });
+
+        if (!order) {
+            return res.status(404).send(sendResponse(1090, messages[1090], false)); // Order not found
+        }
+        if (order.orderStatus === 'cancelled') {
+            return res.status(404).send(sendResponse(1090, messages[1090], false)); // Order not found
+        }
+
+        // Check if the order is cancellable (only 'dispatched' orders can be cancelled)
+        if (order.orderStatus === 'dispatched' || order.orderStatus === 'accepted') {
+            return res.status(400).send(sendResponse(1107, messages[1107], false)); // Updated message for non-cancellable order
+        }
+
+        // Track which shop owners to notify
+        const shopOwnersEmails = {};
+
+        // Update stock (revert product quantities) and gather shop owners' emails
+        for (const item of order.products) {
+            const stock = await Stock.findById(item.stockId);
+            const product = await Product.findById(item.productId);
+
+            if (stock && product) {
+                stock.quantity += item.quantity; // Revert stock quantity
+                product.quantity += item.quantity; // Revert product quantity
+                product.ordersCount -= item.quantity; // Decrement orders count
+                await stock.save();
+                await product.save();
+            }
+
+            // Fetch the shop details and shop owner email
+            const shop = await Shop.findById(item.shopId);
+            if (shop && shop.ownerId) {
+                const shopOwner = await User.findById(shop.ownerId);
+                if (shopOwner) {
+                    if (!shopOwnersEmails[item.shopId]) {
+                        shopOwnersEmails[item.shopId] = {
+                            email: shopOwner.email,
+                            shopName: shop.name, // Store the shop name here
+                            products: []
+                        };
+                    }
+                    // Add the product details for this shop
+                    shopOwnersEmails[item.shopId].products.push({
+                        productName: item.productName,
+                        quantity: item.quantity,
+                        price: item.price
+                    });
+                }
+            }
+        }
+
+        // Update the order status to 'cancelled'
+        order.orderStatus = 'cancelled';
+        await order.save();
+
+        // Send order cancellation email to the user
+        const userEmailData = {
+            name: req.loginUser.name,
+            orderNumber: order.orderNumber,
+        };
+        const userEmailHtml = await getEmailTemplate(userEmailData, 'orderCancelledUser.hbs', false, false);
+        await sendEmail(req.loginUser.email, config.mailEmail, userEmailHtml, userEmailData, '', 'Order Cancellation Confirmation', '');
+
+        // Send notification email to each shop owner with their specific product details
+        for (const [shopId, { email, products, shopName }] of Object.entries(shopOwnersEmails)) {
+            const totalAmount = products.reduce((sum, item) => sum + item.price * item.quantity, 0); // Calculate total amount for the shop's products
+
+            const orderDate = new Date(order.createdAt);
+            const formattedDate = `${orderDate.toLocaleDateString()} ${orderDate.toLocaleTimeString()}`; // e.g. "10/24/2024 1:05:40 PM"
+
+            const adminEmailData = {
+                orderNumber: order.orderNumber,
+                customerEmail: req.loginUser.email,
+                customerName: req.loginUser.name,
+                orderDate: formattedDate,
+                totalAmount,
+                shopName: shopName, // Use shopName from the shopOwnersEmails
+                cancellationReason,
+                paymentMethod: order.paymentMethod,
+                products: shopOwnersEmails, // The list of products for this shop
+            };
+
+            const adminEmailHtml = await getEmailTemplate(adminEmailData, 'orderCancelledAdmin.hbs', false, false);
+            await sendEmail(email, config.mailEmail, adminEmailHtml, adminEmailData, '', 'Order Cancelled Notification', '');
+        }
+
+        // Return successful response
+        return res.status(200).send(sendResponse(1108, messages[1108], true));
+
+    } catch (error) {
+        console.error('🚀 ~ cancelOrder ~ error:', error);
+        return res.status(400).send(sendResponse(1000, messages[1000], false, error.message));
+    }
+};
+
+
+
 module.exports = {
   checkout,
   getOrders,
   getOrderById,
-  updateOrderStatus
+  updateOrderStatus,
+  cancelOrder,
+  getOrdersByUserId
 };

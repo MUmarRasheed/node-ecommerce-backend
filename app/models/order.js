@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { paginate } = require("../helpers/utalityFunctions");
 
 const orderSchema = new mongoose.Schema({
   orderNumber: {
@@ -47,6 +48,21 @@ const orderSchema = new mongoose.Schema({
       type: Number,
       required: true,
     },
+    shopId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Shop',
+      required: true
+    },
+    stockId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Shop',
+      required: true
+    },
+    ownerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Users',
+      required: false
+    },
   }],
   deliveryAddress: {
     type: Object, // Store the entire address object from user details
@@ -74,13 +90,16 @@ const orderSchema = new mongoose.Schema({
   },
   orderStatus: {
     type: String,
-    enum: ['pending', 'completed', 'canceled','delivered','new'], // Order status
+    enum: ['pending','accepted', 'completed','dispatched', 'cancelled','delivered','new'], // Order status
   },
   createdAt: {
     type: Number,
   },
   updatedAt: {
     type: Number 
+  },
+  cancellationReason: {
+    type: String
   },
 });
 
@@ -90,6 +109,7 @@ orderSchema.pre('save', function (next) {
   next();
 });
 
+orderSchema.plugin(paginate);
 // Create the Order model
 const Order = mongoose.model('Order', orderSchema);
 

@@ -48,8 +48,14 @@
         margin-bottom: 20px;
         line-height: 1.25;
       }
+      h1 {
+        font-size: 25px;
+      }
       h2 {
         font-size: 21px;
+      }
+      h3 {
+        font-size: 18px;
       }
       p, ul, ol {
         font-size: 13px;
@@ -68,8 +74,13 @@
       }
       .container .masthead {
         padding: 50px 0;
-        background: #007bff;
+        background: #222222;
         color: white;
+      }
+      .container .masthead h1 {
+        margin: 0 auto !important;
+        max-width: 90%;
+        text-transform: uppercase;
       }
       .container .content {
         background: white;
@@ -93,51 +104,51 @@
 </head>
 <body>
     <table class="body-wrap">
-      <tr>
-        <td class="container">
-
-          <!-- Message start -->
-          <table>
-            <tr>
-              <td align="center" class="masthead">
-                <img src="https://thisisnuts.netlify.app/assets/images/logo.svg" width="220" height="57" alt="Company Logo" />
-              </td>
-            </tr>
-            <tr>
-              <td class="content">
-                <h2>Dear {{data.name}},</h2>
+        <tr>
+            <td class="container">
+                <!-- Message start -->
                 <table>
-                  <tr>
-                    <td>
-                      <p>Thank you for registering with us! To complete your registration, please verify your email address by clicking the link below:</p>
-                      <p style="text-align:center;">
-                        <a href="{{data.verificationLink}}" class="button" style="color: white;">Verify Email</a>
-                      </p>
-                      <p>Please note that the verification link is valid for 1 hour. If you do not verify your email within this time, you will need to request a new verification link.</p>
-                      <p>If you did not create an account, please ignore this email.</p>
-                      <p>Thank you for your cooperation.</p>
-                    </td>
-                  </tr>
+                    <tr>
+                        <td align="center" class="masthead">
+                            <img
+                                src="https://i.ibb.co/3mB8DzB/logo.png"
+                                width="220"
+                                height="57"
+                                alt="Logo"
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="content">
+                            <!-- New Header Content -->
+                            <h2>Hi {{data.name}}</h2>
+                            <p>Your complaint regarding order <strong>{{data.orderNumber}}</strong> has been successfully submitted. We appreciate you reaching out to us and will review your complaint shortly.</p>
+                            <p>We will get back to you as soon as possible. Thank you for your patience!</p>
+                            <!-- Rest of the email content goes here -->
+                        </td>
+                    </tr>
                 </table>
-                <p><em><a href="">– {{company}}</a></em></p>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-      <tr>
-        <td class="container">
-          <!-- Footer start -->
-          <table>
-            <tr>
-              <td class="content footer" align="center">
-                <p>Sent by <a href="https://thisisnuts.netlify.app/">{{company}}</a></p>
-                <p><a href="https://thisisnuts.netlify.app/">{{company}}</a> | <a href="https://thisisnuts.netlify.app/">Contact us</a></p>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
+            </td>
+        </tr>
+        <tr>
+            <td class="container">
+                <!-- Footer start -->
+                <table>
+                    <tr>
+                        <td class="content footer" align="center">
+                            <p>Sent by
+                                <a href="https://thisisnuts.netlify.app/">
+                                    {{company}}</a></p>
+                            <p><a href="https://thisisnuts.netlify.app/">
+                                    {{company}}</a>
+                                |
+                                <a href="https://thisisnuts.netlify.app/">
+                                    Contact us</a></p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
     </table>
 </body>
 </html>

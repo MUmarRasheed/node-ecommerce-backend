@@ -36,6 +36,7 @@ const productSchema = new mongoose.Schema(
     },
     unit: { type: String },
     shopId: { type: mongoose.Schema.Types.ObjectId, ref: "Shop" },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "Users" },
     ordersCount: { type : Number, default: 0 },
     createdAt: { type: Number },
     updatedAt: { type: Number },

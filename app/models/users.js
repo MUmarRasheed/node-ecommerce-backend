@@ -33,6 +33,10 @@ const contactSchema = new Schema({
 //User Schema
 const userSchema = new Schema({
   name: { type: String, default: "" },
+  firstName: { type: String, default: "" },
+  lastName: { type: String, default: "" },
+  phone: { type: String, default: "" },
+  lastName: { type: String, default: "" },
   email: { type: String, unique: true, index: true, default: "" },
   role: { type: Number },
   profileImage: { type: String, default: "" },
@@ -48,12 +52,12 @@ const userSchema = new Schema({
   createdAt: { type: Number },
   isBlocked: { type : Boolean, default: false },
   isEmailVerified: { type: Boolean },
-  isBlocked : { type : Boolean },
   verificationToken: { type: String },
   addresses: [addressSchema],
   contacts: [contactSchema],
   verificationTokenExpiry: { type: Number },
-  shopId: { type: mongoose.Schema.Types.ObjectId, ref: 'Shop' } // Refers to the shop admin manages
+  shopId: { type: mongoose.Schema.Types.ObjectId, ref: 'Shop' }, // Refers to the shop admin manages,
+  shopStatus: { type: Boolean }
 });
 
 //Save createdAt when a document created
@@ -64,6 +68,11 @@ userSchema.pre("save", async function (next) {
   }
   next();
 });
+
+
+userSchema.methods.comparePassword = async function(candidatePassword) {
+    return await bcrypt.compare(candidatePassword, this.password);
+};
 
 userSchema.plugin(paginate);
 

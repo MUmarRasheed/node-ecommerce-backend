@@ -50,6 +50,7 @@ function getLoginToken(id) {
 }
 
 async function getEmailTemplate(data, templateName, link, token) {
+  console.log("🚀 ~ getEmailTemplate ~ data:", data)
   const options = {
     name: data.name,
     token: token,
@@ -202,6 +203,13 @@ function generateSlug(name) {
       .replace(/-+$/, ''); // Trim hyphens from the end
 }
 
+// Function to generate a SKU
+function generateSKU(title) {
+  const randomNum = Math.floor(1000 + Math.random() * 9000); // Generate a random number between 1000 and 9999
+  const sku = `${title.replace(/\s+/g, '-').toUpperCase()}-${randomNum}`; // Create SKU from title, and random number
+  return sku;
+}
+
 module.exports = {
   sendResponse,
   paginate,
@@ -218,5 +226,6 @@ module.exports = {
   createPaymentIntent,
   refundPaymentIntent,
   generateSlug,
-  convertToMultipleObjectIds
+  convertToMultipleObjectIds,
+  generateSKU
 };

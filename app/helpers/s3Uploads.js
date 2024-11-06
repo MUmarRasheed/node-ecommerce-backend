@@ -12,7 +12,6 @@ AWS.config.update({
 
 const s3 = new AWS.S3();
 
-
 const uploadOns3 = async (params) => {
   return new Promise((resolve) => {
     s3.upload(params, (err, data) => {
@@ -34,8 +33,6 @@ const uploadOns3 = async (params) => {
 
 
 const uploadSingleFileOnS3 = async (fileObjArray, pathFolder) => {
-  console.log("🚀 ~ uploadSingleFileOnS3 ~ fileObjArray:", fileObjArray);
-  console.log("🚀 ~ uploadSingleFileOnS3 ~ pathFolder:", pathFolder);
   try {
     const fileObj = fileObjArray[0]; // Assuming only one file is uploaded
     const fileExtension = path.extname(fileObj.originalname);
@@ -69,7 +66,7 @@ const uploadMultipleFilesOnS3 = async (fileObjArray, pathFolder) => {
     for (let i = 0; i < fileObjArray.length; i++) {
       const fileObj = fileObjArray[i];
       const fileExtension = path.extname(fileObj.originalname);
-      let fileUrl = uid(16) + fileExtension;
+      let fileUrl = new Date().getTime() + fileExtension;
       const uploadPath = pathFolder + "/" + fileUrl;
 
       const params = {
@@ -81,7 +78,7 @@ const uploadMultipleFilesOnS3 = async (fileObjArray, pathFolder) => {
 
       const uploadResult = await uploadOns3(params);
       if (uploadResult.status) {
-        fileUrl = `${config.BaseUrl}${uploadPath}`;
+        fileUrl = `${config.link}${uploadPath}`;
         uploadedFiles.push(fileUrl);
       } else {
         return res.status(500).send(sendResponse(1000, "Error uploading file.", false, error.message)
