@@ -1,0 +1,32 @@
+{
+  "PORT": 4003,
+  "LOCALCONNECTION": "mongodb://127.0.0.1:27017/thisisnuts?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.7.1",
+  "MONGOCONNECTION": "mongodb://thisisnuts:VS1gdavypircby@localhost:27017/thisisnuts?authSource=thisisnuts",
+  "pageSize": 10,
+  "salt": 10,
+  "secretKey": "cheNupo?90t6d:L",
+  "googleClientID": "",
+  "googleClientSecret": "",
+  "googleCallbackURL": "http://localhost:5002/auth/google/callback",
+  "link": "https://thisisnuts.nextonprime.com/",
+  "mailService": "gmail",
+  "mailEmail": "testd3v3@gmail.com",
+  "mailPassword": "ddaredmngsorckqb",
+  "company": "Ecommmerce",
+  "companyLogo": "https://thisisnuts.nextonprime.com/",
+  "verifySubject": "Verify Your Email",
+  "forgotPasswordSubject": "Password Reset Request",
+  "registrationSubject": "Account Registration",
+  "forgotPasswordLink": "https://api.thisisnuts.nextonprime.com/reset-password/",
+  "clientIDFacebook": 581223623600012,
+  "clientSecretFacebook": "",
+  "stripeClientSecret": "",
+  "stripePublisherKey": "",
+  "s3Bucket": {
+   
+  },
+  "registerExpire": "300s",
+  "adminEmail":"ast.mm103@gmail.com",
+  "apiUrl":"https://api.thisisnuts.nextonprime.com/",
+  "agencyUrl":"https://agency.thisisnuts.nextonprime.com/"
+}
